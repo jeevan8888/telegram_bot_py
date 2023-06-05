@@ -1,0 +1,90 @@
+# Make sure that the additional_dependencies here match requirements.txt
+
+ci:
+    autofix_prs: false
+    autoupdate_schedule: monthly
+
+repos:
+-   repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+    -   id: black
+        args:
+        - --diff
+        - --check
+-   repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+    -   id: flake8
+-   repo: https://github.com/PyCQA/pylint
+    rev: v3.0.0a6
+    hooks:
+    -   id: pylint
+        files: ^(telegram|examples)/.*\.py$
+        args:
+          - --rcfile=setup.cfg
+          #  run pylint across multiple cpu cores to speed it up-
+          # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
+          - --jobs=0
+
+        additional_dependencies:
+          - httpx~=0.24.1
+          - tornado~=6.2
+          - APScheduler~=3.10.1
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0
+          - . # this basically does `pip install -e .`
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.2.0
+    hooks:
+    -   id: mypy
+        name: mypy-ptb
+        files: ^telegram/.*\.py$
+        additional_dependencies:
+          - types-pytz
+          - types-cryptography
+          - types-cachetools
+          - httpx~=0.24.1
+          - tornado~=6.2
+          - APScheduler~=3.10.1
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0
+          - . # this basically does `pip install -e .`
+    - id: mypy
+      name: mypy-examples
+      files: ^examples/.*\.py$
+      args:
+        - --no-strict-optional
+        - --follow-imports=silent
+      additional_dependencies:
+        - tornado~=6.2
+        - APScheduler~=3.10.1
+        - cachetools~=5.3.1
+        - . # this basically does `pip install -e .`
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.2
+    hooks:
+    -   id: pyupgrade
+        files: ^(telegram|examples|tests|docs)/.*\.py$
+        args:
+          - --py37-plus
+-   repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+    -   id: isort
+        name: isort
+        args:
+        - --diff
+        - --check
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.263'
+    hooks:
+    -   id: ruff
+        name: ruff
+        files: ^(telegram|examples|tests)/.*\.py$
+        additional_dependencies:
+          - httpx~=0.24.1
+          - tornado~=6.2
+          - APScheduler~=3.10.1
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0
